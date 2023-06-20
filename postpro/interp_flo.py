@@ -1,3 +1,5 @@
+# Copyright (c) 2023, University of Cambridge, all rights reserved. Written by Andrew Wheeler, University of Cambridge
+
 import os
 import numpy as np
 from scipy.interpolate import RegularGridInterpolator
@@ -42,10 +44,12 @@ def interp_flo(old_case,new_case):
         fi_new,fj_new,fk_new = np.meshgrid(fi, fj, fk, indexing='ij')
         
         for var in flo_old[ib]: 
-            #print('interpolating ', var)
             values =  flo_old[ib][var]  
-            fn = RegularGridInterpolator(points, values)
-            flo_new[ib][var] = fn((fi_new,fj_new,fk_new))
+            try:
+              fn = RegularGridInterpolator(points, values)
+              flo_new[ib][var] = fn((fi_new,fj_new,fk_new))
+            except:
+              print('Not interpolating ' + var)
             
     
     return flo_new

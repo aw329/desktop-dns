@@ -1,7 +1,10 @@
+# Copyright (c) 2023, University of Cambridge, all rights reserved. Written by Andrew Wheeler, University of Cambridge
+
 import os
 import numpy as np
 from meshing.read_case import *
 from .grad import *
+from .area import *
 
 def read_2d_mean(casename,nfiles):
     
@@ -56,7 +59,7 @@ def read_2d_mean(casename,nfiles):
     nfiles = len(dt)
     
     
-    print(dt,total_time,nfile)
+    #print(dt,total_time,nfile)
     
     # get case details  
     case = read_case(casename)
@@ -100,7 +103,7 @@ def read_2d_mean(casename,nfiles):
             
         iend = ni*nj*nstats_prim                
         q = np.reshape(qq[:iend],[nstats_prim,ni,nj],order='F') # make sure to reshape with fortran rule!
-        q2 = np.reshape(qq[iend-1:-1],[nstats_bud,ni,nj],order='F') # make sure to reshape with fortran rule!
+        q2 = np.reshape(qq[iend:],[nstats_bud,ni,nj],order='F') # make sure to reshape with fortran rule!
         
         ro = q[0,:,:]
         ru = q[1,:,:]
@@ -147,22 +150,33 @@ def read_2d_mean(casename,nfiles):
         ruw = ruw - ru*w
         rvw = rvw - rv*w
         
-        
-        
         tke = 0.5*(ruu + rvv + rww)/ro
-        tu = 100*np.sqrt((2.0/3.0)*tke)/(bcs['vin'])
-
+        tu = 100.0*np.sqrt((2.0/3.0)*tke)/(bcs['vin'])
         
         dudx,dudy = grad(u,x,y)
         dvdx,dvdy = grad(v,x,y)
         dwdx,dwdy = grad(w,x,y)
         dTdx,dTdy = grad(T,x,y)
+        dsdx,dsdy = grad(s,x,y)
+        #d2Tdx,_ = grad(dTdx,x,y)
+        #_,d2Tdy = grad(dTdy,x,y)
+      
         drus,_    = grad(rus,x,y)
         _,drvs    = grad(rvs,x,y)
         d2qx,_    = grad(qxT,x,y)
         _,d2qy    = grad(qyT,x,y)
 
-        
+        # cell area
+        ar = np.zeros([ni,nj])
+        a  = area(x,y)
+       
+        # propagate to points to determine resolution
+        ar = np.zeros([ni,nj])
+        ar[:-1,:-1] = a
+        ar[-1,:] = ar[-2,:]
+        ar[:,-1] = ar[:,-2]
+        ar[-1,-1] = ar[-2,-2]
+
         # strain tensor (2D,w=0,d/dz=0)
         s11 = dudx
         s22 = dvdy                
@@ -209,8 +223,13 @@ def read_2d_mean(casename,nfiles):
         Dsr = (d2qx + d2qy)     # rev. term
         Ds_phi = diss_av/T      # dissipation due to time mean strain
         Ds_eps = dissT - Ds_phi # turbulent dissipation
-
-
+        Ds_rans = ru*dsdx + rv*dsdy      # LHS (flux derivative)
+       
+        # estimate Kolmogorov length-scale
+        #eps = dissT*T
+        eps = Ds_eps*T
+        Lkol = (((mu/ro)**3.0)/np.abs(eps))**0.25
+        res = np.sqrt(ar)/Lkol
         
         flo[ib]['ro'] = ro
         flo[ib]['ru'] = ru
@@ -231,11 +250,18 @@ def read_2d_mean(casename,nfiles):
         flo[ib]['mach'] = mach
         
         flo[ib]['Ds'] = Ds
+        flo[ib]['Dsi'] = Ds + Dsr  
         flo[ib]['Dsr'] = Dsr
         flo[ib]['Ds_phi'] = Ds_phi
         flo[ib]['Ds_eps'] = Ds_eps
+        flo[ib]['Ds_rans'] = Ds_rans
+
+        flo[ib]['rus'] = rus
+        flo[ib]['rvs'] = rvs
         
         flo[ib]['dissT'] = dissT
+       
+        flo[ib]['mu'] = mu
         
         flo[ib]['tke'] = tke
         flo[ib]['tu'] = tu
@@ -243,10 +269,12 @@ def read_2d_mean(casename,nfiles):
         flo[ib]['mut_opt'] = mut_opt
         flo[ib]['S_'] = S_
         
+        flo[ib]['area'] = a
+        flo[ib]['res'] = res
         
         
 
-    return flo,blk 
+    return flo,blk,total_time 
 
 
 

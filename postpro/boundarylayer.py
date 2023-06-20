@@ -1,3 +1,6 @@
+# Copyright (c) 2023, University of Cambridge, all rights reserved. Written by Andrew Wheeler, University of Cambridge
+
+
 import os
 import numpy as np
 import matplotlib.pyplot as plt
@@ -6,8 +9,9 @@ from scipy.interpolate import interp1d
 from meshing.read_case import *
 from .read_flo import *
 from .grad import *
+from .read_2d_mean import *
 
-def boundarylayer(casename):
+def boundarylayer(casename,*args):
     
     flo = {}
         
@@ -17,7 +21,12 @@ def boundarylayer(casename):
     case = read_case(casename)
     
     # get flow and geom
-    prop,blk = read_flo(casename)
+    if(len(args) > 0):
+       nfiles = args[0]
+       #print(nfiles)
+       prop,blk,_ = read_2d_mean(casename,args[0])
+    else:
+       prop,blk = read_flo(casename)
       
     # get solver version
     version = case['solver']['version']    
@@ -376,21 +385,6 @@ def boundarylayer(casename):
                 d10=np.append(d10, np.sum((turbav[:edgen] + diss_model[:edgen])*dely[:edgen]))
                  
                    
-                #ue(ns) = uinf(i);
-                #retheta(ns) = d2(ns)*ruinf(i)/mu(i,nj);
-                #cf(ns) = walls.tauw(ns)/(0.5*ruinf(i)*uinf(i));
-                #cd(ns) = (d10(ns) + d9(ns))/(ue(ns)^3);
-                #Us(ns) = (d9(ns)*2.0/cf(ns))/(ue(ns)^3);
-                #prod(ns) = d10(ns)/(ue(ns)^3);
-                #ctau(ns) = prod(ns)/(1-Us(ns));
-                #
-                #XX(ns) = x(i,1);
-                #YY(ns) = y(i,1);
-                
-    #plt.figure(1)
-    #plt.plot(XX,d0,'k.',XX,d1,'r.',XX,d2,'b.')  
-    #plt.show()
-    
     xLE = min(XX)
     xTE = max(XX)
     cax = xTE-xLE
@@ -400,8 +394,6 @@ def boundarylayer(casename):
     #ISS = ISS and (xn<0.95 and xn>0.05)
     #IPS = IPS and (xn<0.95 and xn>0.05)
     #
-    
-     
     
     bl = {}
     bl['ss'] = {}
@@ -417,18 +409,10 @@ def boundarylayer(casename):
     bl['ss']['d1'  ] = d1[ISS]
     bl['ss']['d2'  ] = d2[ISS]
     bl['ss']['d3'  ] = d3[ISS]
-    #bl['ss']['d10' ] =d10[ISS]
     bl['ss']['cf'  ] = cf[ISS]
     bl['ss']['yplus'  ] = yplus[ISS]
     bl['ss']['xplus'  ] = xplus[ISS]
     bl['ss']['zplus'  ] = zplus[ISS]
-   
-    #bl['ss']['cd'  ] = cd[ISS]
-    #bl['ss']['Ret' ] =ret[ISS]
-    #bl['ss']['ue'  ] = ue[ISS]
-    #bl['ss']['us'  ] = Us[ISS]
-    #bl['ss']['ctau']=ctau[ISS]
-    #bl['ss']['prod']=prod[ISS]
    
     bl['ps']['x'   ] = XX[IPS]
     bl['ps']['y'   ] = YY[IPS]
@@ -436,19 +420,10 @@ def boundarylayer(casename):
     bl['ps']['d1'  ] = d1[IPS]
     bl['ps']['d2'  ] = d2[IPS]
     bl['ps']['d3'  ] = d3[IPS]
-    #bl['ps']['d10' ] =d10[IPS]
     bl['ps']['cf'  ] = cf[IPS]
     bl['ps']['yplus'  ] = yplus[IPS]
     bl['ps']['xplus'  ] = xplus[IPS]
     bl['ps']['zplus'  ] = zplus[IPS]
-   
-    #bl['ps']['cd'  ] = cd[IPS]
-    #bl['ps']['Ret' ] =ret[IPS]
-    #bl['ps']['ue'  ] = ue[IPS]
-    #bl['ps']['us'  ] = Us[IPS]
-    #bl['ps']['ctau']=ctau[IPS]
-    #bl['ps']['prod']=prod[IPS]
-    
     
     return bl
 

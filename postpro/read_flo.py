@@ -1,7 +1,11 @@
+# Copyright (c) 2023, University of Cambridge, all rights reserved. Written by Andrew Wheeler, University of Cambridge
+
+
 import os
 import numpy as np
 from meshing.read_case import *
 from .grad import *
+from .area import *
 
 def read_flo(casename):
     
@@ -147,7 +151,7 @@ def read_flo(casename):
             dvdx[:,:,k],dvdy[:,:,k] = grad(v[:,:,k],x,y)
                 
         vortz = dvdx - dudy
-        
+        a = area(x,y)
 
         flo[ib]['ro'] = ro
         flo[ib]['ru'] = ru
@@ -168,5 +172,6 @@ def read_flo(casename):
         flo[ib]['mach'] = mach
         flo[ib]['mu'] = mu
         flo[ib]['mut_model'] = mut_model
+        flo[ib]['area'] = a
 
     return flo,blk
