@@ -1,3 +1,5 @@
+# Copyright (c) 2023, University of Cambridge, all rights reserved. Written by Andrew Wheeler, University of Cambridge
+
 import os
 import numpy as np
 
@@ -9,7 +11,7 @@ def read_grid(casename):
     path = os.path.join(os.getcwd(),casename)
     blockdims = os.path.join(path,'blockdims.txt')
     bijk = np.loadtxt(blockdims,dtype=np.int32)
-    print(len(np.shape(bijk)))
+    #print(len(np.shape(bijk)))
     if( len(np.shape(bijk))==1 ):
         NB = 1
     else:

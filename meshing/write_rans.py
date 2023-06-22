@@ -15,9 +15,10 @@ def write_rans(casename,rans):
     if(rans['if_rans']==1):
       f.write('%f\n' %(0.0))
     elif(rans['if_rans']==2):
-      f.write('%f\n' %(rans['fac']))
+      f.write('%f\n' %(rans['nrans_file']))
       f.write('%s\n' %(rans['path1']))
       f.write('%s\n' %(rans['path2']))
+      f.write('%f\n' %(rans['fac']))
  
     f.close()
     

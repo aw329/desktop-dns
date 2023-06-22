@@ -1,3 +1,5 @@
+# Copyright (c) 2023, University of Cambridge, all rights reserved. Written by Andrew Wheeler, University of Cambridge
+
 import numpy as np
 
 def spacing(n,fx_expan,flag):

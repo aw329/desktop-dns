@@ -1,3 +1,5 @@
+# Copyright (c) 2023, University of Cambridge, all rights reserved. Written by Andrew Wheeler, University of Cambridge
+
 import numpy as np
 
 def clip_curve(x,y,i1,i2,n):

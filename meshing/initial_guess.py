@@ -1,12 +1,11 @@
+# Copyright (c) 2023, University of Cambridge, all rights reserved. Written by Andrew Wheeler, University of Cambridge
+
 import os
 import numpy as np
 from numpy import ndarray
-from scipy.interpolate import interp1d,interp2d,griddata
-
-from scipy.spatial import cKDTree
+from scipy.interpolate import interp1d,griddata
 
 import matplotlib.pyplot as plt
-
 
 from .read_profile import *
 from .clip_curve import *
@@ -14,7 +13,7 @@ from .curve_length import *
 from .spacing import *
 
 
-def initial_guess(mesh,geom,bcs,gas,n,nj):
+def initial_guess(mesh,geom,bcs,gas,n,nj,Yp):
    # flow initial guess from blade profile
 
    alpha_in = bcs['alpha']
@@ -128,7 +127,9 @@ def initial_guess(mesh,geom,bcs,gas,n,nj):
        x[i,:] = xs[i] + (xp[i] - xs[i])*fj    
        y[i,:] = ys[i] + (yp[i] - ys[i])*fj     
 
-
+   floss = (x - xs[0])/(xs[-1] - xs[0])
+   floss[ floss<0.0 ] = 0.0
+   floss[ floss>1.0 ] = 1.0   
    
    for m in range(200):#range(200):
                      
@@ -212,7 +213,9 @@ def initial_guess(mesh,geom,bcs,gas,n,nj):
       v = q*d_yi/d_si
           
       T = Toin - q*q*0.5/cp
-      p = Poin*((T/Toin)**(gam/(gam-1.0)))
+      #dPo = 0.5*ro*q*q*Yp*(x - x[0,0])/(x[-1,-1] - x[0,0])
+      dPo = 0.5*ro*vin*vin*Yp*floss
+      p = (Poin-dPo)*((T/Toin)**(gam/(gam-1.0)))
       ro = p/(rgas*T)
           
   

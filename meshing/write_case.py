@@ -102,15 +102,15 @@ def write_case(case):
         block_groups = solver['block_groups']
     
     # number of block groups
-        f.write('%d\n' %(len(block_groups)))              
+        f.write('%d' %(len(block_groups)))              
     
         for b in block_groups:
         # number of blocks in block group
-            f.write('%d\n' %(len(b['blocks'])))    
+            f.write('\n%d\n' %(len(b['blocks'])))    
         # blocks in block group    
             for i in range(len(b['blocks'])):
                 f.write('%d ' %(b['blocks'][i]))  
-        
+             
     # write rest of file
     # check these are ok for your case!
     

@@ -124,13 +124,15 @@ def plot_spectrum(casename,blocks,iexclude):
     
     imid = np.int(nj/2)
     imax = np.argmax(Ek)
+    imin = np.argmin(Ek)
     iplot = np.array(range(1,imid))    
-    
+    iref = np.int(imax*0.75 + imin*0.25)
+
     # Kolmogorov for inertial range
     Ekm = np.mean(Ek)
     f_kol =  f
-    Ek_kol = Ek[imax]*((f_kol/f[imax])**(-5.0/3.0))
-    
+    #Ek_kol = Ek[imax]*((f_kol/f[imax])**(-5.0/3.0))
+    Ek_kol = Ek[iref]*((f_kol/f[iref])**(-5.0/3.0))
     
     plt.figure(1)
     

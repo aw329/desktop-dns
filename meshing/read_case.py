@@ -1,3 +1,5 @@
+# Copyright (c) 2023, University of Cambridge, all rights reserved. Written by Andrew Wheeler, University of Cambridge
+
 import os
 import numpy as np
 from .read_grid import *
@@ -29,15 +31,15 @@ def read_case(casename):
     gpu_file_path = os.path.join(path,gpu_file)
        
     if(os.path.exists(cpu_file_path)):
-       print('cpu input file found') 
+       #print('cpu input file found') 
        cpu = True
        
     if(os.path.exists(gpu_file_path)):
-       print('gpu input file found') 
+       #print('gpu input file found') 
        gpu = True
     
     if(cpu and gpu):
-       print('defaulting to gpu version')
+       #print('defaulting to gpu version')
        cpu = False           
     
     

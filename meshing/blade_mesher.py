@@ -1,12 +1,13 @@
+# Copyright (c) 2023, University of Cambridge, all rights reserved. Written by Andrew Wheeler, University of Cambridge
+
 import matplotlib.pyplot as plt
 from .read_profile   import *
 from .curve_length   import *
 from .blade_topology import *
 from .mesh_refinement import *
 from .mesh_smooth import *
-from .write_case import *
 
-def blade_mesher(mesh,bcs,gas,solver):
+def blade_mesher(mesh):
 
     npp = mesh['npp']
     Lup = mesh['Lup']
@@ -43,37 +44,15 @@ def blade_mesher(mesh,bcs,gas,solver):
     yprof = yprof*scale_factor*flip
  
     
-    # write 3DNS case files
+    # store 3DNS case files
     case = {}
+    case['casename'] = mesh['case']
     case['blk'] = blk
     case['next_block'] = next_block
     case['next_patch'] = next_patch
     case['corner'] = corner
-    case['bcs'] = bcs
-    case['gas'] = gas
-    case['solver'] = solver
-    case['casename'] = mesh['case']
-   
-    
-    write_case(case)
-    
-    # plot profile, topology and mesh
-    plt.figure(1)
-    plt.plot(xprof,yprof,'-r.')
-    plt.axis('equal')
-    
-    for ib in range(NB):
-        xnew=blk[ib]['x']
-        ynew=blk[ib]['y']
-        plt.plot(xnew,ynew + pitch,'k')
-        plt.plot(np.transpose(xnew),np.transpose(ynew) + pitch,'k')
-    
-    plt.show()
-    
-    
-    # 
 #
-    return blk
+    return case
     
 
 if __name__ == '__main__':
@@ -103,30 +82,4 @@ if __name__ == '__main__':
         
     mesh['profile'] = 'geom/profile.txt'
     mesh['case'] = 'case' 
-
-    # solver inputs
-    # boundary conditions
-    bcs['Toin']  = 300.0
-    bcs['Poin']  = 100000.0
-    bcs['pexit'] = 99625.0
-    bcs['vin']   = 50.0
-    bcs['alpha'] = 40.0
-    bcs['gamma'] = 0.0
-    bcs['aturb'] = -1.0
-    bcs['lturb'] = 10*ywall[1]
-    bcs['ilength'] = 500
-    bcs['radprof'] = 0
-    bcs['g_z'] = 0.0
-    bcs['twall'] = -1.0
-    bcs['cax'] = 1.0
-    
-    # gas properties
-    gas['gamma']   = 1.4
-    gas['cp']      = 1005.0
-    gas['mu_ref']  = 100*1.82e-05
-    gas['mu_tref'] = 273.0
-    gas['mu_cref'] = 110.4
-    gas['pr']      = 0.72
-    
-
-    main(mesh,bcs,gas)    
+    main(mesh)    

@@ -1,3 +1,5 @@
+# Copyright (c) 2023, University of Cambridge, all rights reserved. Written by Andrew Wheeler, University of Cambridge
+
 from .curve_length   import *
 from .multiblock import *
 from .make_periodic_smooth2 import *
@@ -181,9 +183,16 @@ def smooth(next_block,next_patch,b,x_prof,y_prof,s_prof,x_prof2,y_prof2,s_prof2,
                fy=spacing(nj_new,1.0 / fex,0)
                ynorm=ynorm / ynorm[-1]
                yni=fy
+               f_x = interp1d(ynorm, xnew[i,:],kind='linear')
+               f_y = interp1d(ynorm, ynew[i,:],kind='linear')                   
                
-               f_x = interp1d(ynorm, xnew[i,:], kind='cubic')
-               f_y = interp1d(ynorm, ynew[i,:], kind='cubic')                   
+               #odd = nj_new % 2
+               #if(odd):
+               #  f_x = interp1d(ynorm[0:nj_new:2], xnew[i,0:nj_new:2], fill_value='extrapolate',kind='cubic')
+               #  f_y = interp1d(ynorm[0:nj_new:2], ynew[i,0:nj_new:2], fill_value='extrapolate',kind='cubic')                   
+               #else:
+               #  f_x = interp1d(ynorm[1:nj_new:2], xnew[i,1:nj_new:2], fill_value='extrapolate',kind='cubic')
+               #  f_y = interp1d(ynorm[1:nj_new:2], ynew[i,1:nj_new:2], fill_value='extrapolate',kind='cubic')                   
                
                xnew[i,:]=f_x(yni)
                ynew[i,:]=f_y(yni)
