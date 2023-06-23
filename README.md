@@ -27,10 +27,6 @@ There are 4 notebooks and these use a range of Python routines that can be found
 
 4. RANS modelling
 
-
-Some experience of turbomachinery aerodynamics is required.
-
-
 ----
 
 Please use the Discussions section to add any comments and feedback. Useful feedback is always appreciated.
